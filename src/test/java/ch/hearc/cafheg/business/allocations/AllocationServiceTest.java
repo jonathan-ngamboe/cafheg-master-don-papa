@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -68,6 +70,65 @@ class AllocationServiceTest {
         () -> assertThat(all.get(1).getCanton()).isEqualTo(Canton.FR),
         () -> assertThat(all.get(1).getDebut()).isEqualTo(LocalDate.now()),
         () -> assertThat(all.get(1).getFin()).isNull());
+  }
+
+  @Test
+  void getParentDroitAllocation_WhenParent1IsOnlyActive_ShouldReturnParent1() {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("parent1ActiviteLucrative", true);
+    parameters.put("parent2ActiviteLucrative", false);
+    parameters.put("parent1Salaire", new BigDecimal("5000"));
+    parameters.put("parent2Salaire", new BigDecimal("3000"));
+    String result = allocationService.getParentDroitAllocation(parameters);
+    assertThat(result).isEqualTo("Parent1");
+  }
+
+  @Test
+  void getParentDroitAllocation_WhenParent2IsOnlyActive_ShouldReturnParent2() {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("parent1ActiviteLucrative", false);
+    parameters.put("parent2ActiviteLucrative", true);
+    parameters.put("parent1Salaire", new BigDecimal("3000"));
+    parameters.put("parent2Salaire", new BigDecimal("5000"));
+    String result = allocationService.getParentDroitAllocation(parameters);
+    assertThat(result).isEqualTo("Parent2");
+  }
+
+  @Test
+  void getParentDroitAllocation_WhenBothParentsActiveAndSalary1GreaterThanSalary2_ShouldReturnParent1() {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("parent1ActiviteLucrative", true);
+    parameters.put("parent2ActiviteLucrative", true);
+    parameters.put("parent1Salaire", new BigDecimal("7000"));
+    parameters.put("parent2Salaire", new BigDecimal("5000"));
+    String result = allocationService.getParentDroitAllocation(parameters);
+    assertThat(result).isEqualTo("Parent1");
+  }
+
+  @Test
+  void getParentDroitAllocation_WhenBothParentsActiveAndSalary2GreaterThanSalary1_ShouldReturnParent2() {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("parent1ActiviteLucrative", true);
+    parameters.put("parent2ActiviteLucrative", true);
+    parameters.put("parent1Salaire", new BigDecimal("5000"));
+    parameters.put("parent2Salaire", new BigDecimal("7000"));
+    String result = allocationService.getParentDroitAllocation(parameters);
+    assertThat(result).isEqualTo("Parent2");
+  }
+
+  @Test
+  void getParentDroitAllocation_WhenMissingValues_ShouldUseDefaultValuesAndDecide() {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("parent1ActiviteLucrative", true);
+    String result = allocationService.getParentDroitAllocation(parameters);
+    assertThat(result).isEqualTo("Parent1");
+  }
+
+  @Test
+  void getParentDroitAllocation_WhenAllValuesNull_ShouldHandleGracefully() {
+    Map<String, Object> parameters = new HashMap<>();
+    String result = allocationService.getParentDroitAllocation(parameters);
+    assertThat(result).isEqualTo("Parent2");
   }
 
 }

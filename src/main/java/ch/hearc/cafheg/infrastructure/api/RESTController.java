@@ -1,10 +1,9 @@
 package ch.hearc.cafheg.infrastructure.api;
 
-import static ch.hearc.cafheg.infrastructure.persistance.Database.inTransaction;
-
 import ch.hearc.cafheg.business.allocations.Allocataire;
 import ch.hearc.cafheg.business.allocations.Allocation;
 import ch.hearc.cafheg.business.allocations.AllocationService;
+import ch.hearc.cafheg.business.allocations.ParentAllocationParameters;
 import ch.hearc.cafheg.business.versements.VersementService;
 import ch.hearc.cafheg.infrastructure.pdf.PDFExporter;
 import ch.hearc.cafheg.infrastructure.persistance.AllocataireMapper;
@@ -15,7 +14,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.List;
+
+import static ch.hearc.cafheg.infrastructure.persistance.Database.inTransaction;
 
 @RestController
 public class RESTController {
@@ -43,7 +44,7 @@ public class RESTController {
   }
    */
   @PostMapping("/droits/quel-parent")
-  public String getParentDroitAllocation(@RequestBody Map<String, Object> params) {
+  public String getParentDroitAllocation(@RequestBody ParentAllocationParameters params) {
     return inTransaction(() -> allocationService.getParentDroitAllocation(params));
   }
 

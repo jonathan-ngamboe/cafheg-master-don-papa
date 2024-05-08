@@ -16,6 +16,9 @@ public class ParentAllocationParameters {
         this.parent2Salaire = parent2Salaire;
     }
 
+    public ParentAllocationParameters() {
+    }
+
     public boolean isParent1ActiviteLucrative() {
         return parent1ActiviteLucrative;
     }

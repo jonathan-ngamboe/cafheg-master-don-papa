@@ -87,15 +87,15 @@ public class AllocationService {
 
   // Vérifie l'activité indépendante et les salaires des parents
   private String checkIndependenceAndSalaries(ParentAllocationParameters params) {
-    if (params.isParent1Independant() && !params.isParent2Independant()) {
+    if (params.isParent1Salarie() && params.isParent2Independant()) {
       return PARENT_1;
-    } else if (!params.isParent1Independant() && params.isParent2Independant()) {
+    } else if (params.isParent2Salarie() && params.isParent1Independant()) {
       return PARENT_2;
     } else {
-      // Both are either independent or salaried, compare salaries
-      BigDecimal salaireP1 = params.getParent1Salaire();
-      BigDecimal salaireP2 = params.getParent2Salaire();
-      return salaireP1.compareTo(salaireP2) > 0 ? PARENT_1 : PARENT_2;
+        // Les deux parents sont indépendants ou salariés, le parent avec le salaire le plus élevé a le droit
+        BigDecimal salaireP1 = params.getParent1Salaire();
+        BigDecimal salaireP2 = params.getParent2Salaire();
+        return salaireP1.compareTo(salaireP2) > 0 ? PARENT_1 : PARENT_2;
     }
   }
 

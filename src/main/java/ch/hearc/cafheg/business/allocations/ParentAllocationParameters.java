@@ -3,8 +3,8 @@ package ch.hearc.cafheg.business.allocations;
 import java.math.BigDecimal;
 
 public class ParentAllocationParameters {
-    private boolean parent1ActiviteLucrative;
-    private boolean parent2ActiviteLucrative;
+    private boolean parent1Salarie;
+    private boolean parent2Salarie;
     private BigDecimal parent1Salaire;
     private BigDecimal parent2Salaire;
     private boolean parent1VitAvecEnfant;
@@ -17,8 +17,8 @@ public class ParentAllocationParameters {
     private boolean parent1Independant;
     private boolean parent2Independant;
 
-    public ParentAllocationParameters(boolean parent1ActiviteLucrative,
-                                      boolean parent2ActiviteLucrative,
+    public ParentAllocationParameters(boolean parent1Salarie,
+                                      boolean parent2Salarie,
                                       BigDecimal parent1Salaire,
                                       BigDecimal parent2Salaire,
                                       boolean parent1VitAvecEnfant,
@@ -30,8 +30,8 @@ public class ParentAllocationParameters {
                                       boolean parent2TravailleCantonDomicile,
                                       boolean parent1Independant,
                                       boolean parent2Independant) {
-        this.parent1ActiviteLucrative = parent1ActiviteLucrative;
-        this.parent2ActiviteLucrative = parent2ActiviteLucrative;
+        this.parent1Salarie = parent1Salarie;
+        this.parent2Salarie = parent2Salarie;
         this.parent1Salaire = parent1Salaire;
         this.parent2Salaire = parent2Salaire;
         this.parent1VitAvecEnfant = parent1VitAvecEnfant;
@@ -49,11 +49,19 @@ public class ParentAllocationParameters {
     }
 
     public boolean isParent1ActiviteLucrative() {
-        return parent1ActiviteLucrative;
+        return parent1Salarie || parent1Independant;
     }
 
     public boolean isParent2ActiviteLucrative() {
-        return parent2ActiviteLucrative;
+        return parent2Salarie || parent2Independant;
+    }
+
+    public boolean isParent1Salarie() {
+        return parent1Salarie;
+    }
+
+    public boolean isParent2Salarie() {
+        return parent2Salarie;
     }
 
     public boolean isParentsViventEnsemble() {

@@ -71,26 +71,34 @@ class AllocationServiceTest {
         () -> assertThat(all.get(1).getFin()).isNull());
   }
 
-  @Test
-  void getParentDroitAllocation_WhenMissingValues_ShouldUseDefaultValuesAndDecide() {
-    ParentAllocationParameters parameters = new ParentAllocationParameters(true, false, null, null, false, false, false, false, false, false, false, false, false);
-    String result = allocationService.getParentDroitAllocation(parameters);
-    assertThat(result).isEqualTo("Parent1");
-  }
+    @Test
+        void getParentDroitAllocation_WhenMissingValues_ShouldUseDefaultValuesAndDecide() {
+        ParentAllocationParameters parameters = new ParentAllocationParameters(true, false, null, null, false, false, false, false, false, false, false, false, false);
+        String result = allocationService.getParentDroitAllocation(parameters);
+        assertThat(result).isEqualTo("Parent1");
+    }
 
-  @Test
-  void getParentDroitAllocation_WhenAllValuesNull_ShouldHandleGracefully() {
-    ParentAllocationParameters parameters = new ParentAllocationParameters(false, false, null, null, false, false, false, false, false, false, false, false, false);
-    String result = allocationService.getParentDroitAllocation(parameters);
-    assertThat(result).isNotBlank(); // Make sure it doesn't crash and returns a default
-  }
+    @Test
+        void getParentDroitAllocation_WhenAllValuesNull_ShouldHandleGracefully() {
+        ParentAllocationParameters parameters = new ParentAllocationParameters(false, false, null, null, false, false, false, false, false, false, false, false, false);
+        String result = allocationService.getParentDroitAllocation(parameters);
+        assertThat(result).isNotBlank(); // Make sure it doesn't crash and returns a default
+    }
 
-  // 1 Parent avec activité lucrative, l'autre sans activité lucrative et inversement
+    // 1 Parent avec activité lucrative, l'autre sans activité lucrative et inversement
     @Test
     void getParentDroitAllocation_WhenParent1HasActivityAndParent2HasNoActivity_ShouldReturnParent1() {
         ParentAllocationParameters parameters = new ParentAllocationParameters(true, false, new BigDecimal("5000"), new BigDecimal("3000"), false, false, false, false, false, false, false, false, false);
         String result = allocationService.getParentDroitAllocation(parameters);
         assertThat(result).isEqualTo("Parent1");
+    }
+
+    // Test inverse
+    @Test
+    void getParentDroitAllocation_WhenParent2HasActivityAndParent1HasNoActivity_ShouldReturnParent2() {
+        ParentAllocationParameters parameters = new ParentAllocationParameters(false, true, new BigDecimal("5000"), new BigDecimal("3000"), false, false, false, false, false, false, false, false, false);
+        String result = allocationService.getParentDroitAllocation(parameters);
+        assertThat(result).isEqualTo("Parent2");
     }
 
     // Les deux parents ont une activité lucrative, 1 parent avec autorité parentale, l'autre sans autorité parentale
@@ -101,12 +109,28 @@ class AllocationServiceTest {
         assertThat(result).isEqualTo("Parent1");
     }
 
-  // Les deux parents ont une activité lucrative, les deux parents avec autorité parentale, les parents vivent séparément, le parent qui vit avec l'enfant a droit
+    // Test inverse
+    @Test
+    void getParentDroitAllocation_WhenBothParentsHaveActivityAndParent2HasAuthority_ShouldReturnParent2() {
+        ParentAllocationParameters parameters = new ParentAllocationParameters(true, true, new BigDecimal("5000"), new BigDecimal("3000"), false, false, false, false, true, false, false, false, false);
+        String result = allocationService.getParentDroitAllocation(parameters);
+        assertThat(result).isEqualTo("Parent2");
+    }
+
+    // Les deux parents ont une activité lucrative, les deux parents avec autorité parentale, les parents vivent séparément, le parent qui vit avec l'enfant a droit
     @Test
     void getParentDroitAllocation_WhenBothParentsHaveActivityAndBothHaveAuthorityAndParentsLiveSeparately_ShouldReturnParent1() {
         ParentAllocationParameters parameters = new ParentAllocationParameters(true, true, new BigDecimal("5000"), new BigDecimal("3000"), true, false, false, true, true, true, false, false, false);
         String result = allocationService.getParentDroitAllocation(parameters);
         assertThat(result).isEqualTo("Parent1");
+    }
+
+    // Test inverse
+    @Test
+    void getParentDroitAllocation_WhenBothParentsHaveActivityAndBothHaveAuthorityAndParentsLiveSeparately_ShouldReturnParent2() {
+        ParentAllocationParameters parameters = new ParentAllocationParameters(true, true, new BigDecimal("5000"), new BigDecimal("3000"), false, true, false, true, true, true, false, false, false);
+        String result = allocationService.getParentDroitAllocation(parameters);
+        assertThat(result).isEqualTo("Parent2");
     }
 
     // Les deux parents ont une activité lucrative, les deux parents avec autorité parentale, les parents vivent ensemble, 1 parent travaille dans le canton de domicile de l'enfant, l'autre non, le parent qui travaille dans le canton de domicile de l'enfant a droit
@@ -117,27 +141,60 @@ class AllocationServiceTest {
         assertThat(result).isEqualTo("Parent1");
     }
 
-    // Les deux parents ont une activité lucrative, les deux parents avec autorité parentale, les parents vivent ensemble, les deux parents sont indépendants, le parent avec le plus gros salaire a droit
+    // Test inverse
     @Test
-    void getParentDroitAllocation_WhenBothParentsHaveActivityAndBothHaveAuthorityAndParentsLiveTogetherAndBothAreIndependant_ShouldReturnParent1() {
-        ParentAllocationParameters parameters = new ParentAllocationParameters(true, true, new BigDecimal("5000"), new BigDecimal("3000"), false, false, true, true, true, true, false, true, true);
+    void getParentDroitAllocation_WhenBothParentsHaveActivityAndBothHaveAuthorityAndParentsLiveTogetherAndParent2WorksInChildCanton_ShouldReturnParent2() {
+        ParentAllocationParameters parameters = new ParentAllocationParameters(true, true, new BigDecimal("5000"), new BigDecimal("3000"), false, false, true, true, true, false, true, false, false);
+        String result = allocationService.getParentDroitAllocation(parameters);
+        assertThat(result).isEqualTo("Parent2");
+    }
+
+    // Les deux parents ont une activité lucrative, les deux parents avec autorité parentale, les parents vivent ensemble, les 2 sont dans le canton de domicile de l'enfant, les deux parents sont indépendants, le parent avec le plus gros salaire a droit
+    @Test
+    void getParentDroitAllocation_WhenBothParentsHaveActivityAndBothHaveAuthorityAndParentsLiveTogetherAndBothAreIndepenfant_ShouldReturnParent1() {
+        ParentAllocationParameters parameters = new ParentAllocationParameters(false, false, new BigDecimal("5000"), new BigDecimal("3000"), false, false, true, true, true, true, true, true, true);
         String result = allocationService.getParentDroitAllocation(parameters);
         assertThat(result).isEqualTo("Parent1");
     }
 
-    // Les deux parents ont une activité lucrative, les deux parents avec autorité parentale, les parents vivent ensemble, 1 parent est salarié et l'autre indépendant, le parent salarié a droit
+    // Test inverse
     @Test
-    void getParentDroitAllocation_WhenBothParentsHaveActivityAndBothHaveAuthorityAndParentsLiveTogetherAndOneIsEmployedAndTheOtherIsIndependant_ShouldReturnParent1() {
-        ParentAllocationParameters parameters = new ParentAllocationParameters(true, true, new BigDecimal("5000"), new BigDecimal("3000"), false, false, true, true, true, true, false, true, false);
+    void getParentDroitAllocation_WhenBothParentsHaveActivityAndBothHaveAuthorityAndParentsLiveTogetherAndBothAreIndepenfant_ShouldReturnParent2() {
+        ParentAllocationParameters parameters = new ParentAllocationParameters(false, false, new BigDecimal("3000"), new BigDecimal("5000"), false, false, true, true, true, true, true, true, true);
+        String result = allocationService.getParentDroitAllocation(parameters);
+        assertThat(result).isEqualTo("Parent2");
+    }
+
+    // Les deux parents ont une activité lucrative, les deux parents avec autorité parentale, les parents vivent ensemble, les 2 sont dans le canton de domicile de l'enfant, 1 parent est salarié et l'autre indépenfant, le parent qui est salarié a droit
+    @Test
+    void getParentDroitAllocation_WhenBothParentsHaveActivityAndBothHaveAuthorityAndParentsLiveTogetherAndOneIsSalariedAndOtherIsIndepenfant_ShouldReturnParent1() {
+        ParentAllocationParameters parameters = new ParentAllocationParameters(true, false, new BigDecimal("5000"), new BigDecimal("3000"), false, false, true, true, true, true, true, false, true);
         String result = allocationService.getParentDroitAllocation(parameters);
         assertThat(result).isEqualTo("Parent1");
     }
 
-    // Les deux parents ont une activité lucrative, les deux parents avec autorité parentale, les parents vivent ensemble, les deux parents sont salariés, le parent avec le plus gros salaire a droit
+    // Test inverse
     @Test
-    void getParentDroitAllocation_WhenBothParentsHaveActivityAndBothHaveAuthorityAndParentsLiveTogetherAndBothAreEmployed_ShouldReturnParent1() {
-        ParentAllocationParameters parameters = new ParentAllocationParameters(true, true, new BigDecimal("5000"), new BigDecimal("3000"), false, false, true, true, true, true, false, false, false);
+    void getParentDroitAllocation_WhenBothParentsHaveActivityAndBothHaveAuthorityAndParentsLiveTogetherAndOneIsSalariedAndOtherIsIndepenfant_ShouldReturnParent2() {
+        ParentAllocationParameters parameters = new ParentAllocationParameters(false, true, new BigDecimal("5000"), new BigDecimal("3000"), false, false, true, true, true, true, true, true, false);
+        String result = allocationService.getParentDroitAllocation(parameters);
+        assertThat(result).isEqualTo("Parent2");
+    }
+
+    // Les deux parents ont une activité lucrative, les deux parents avec autorité parentale, les parents vivent ensemble, les deux parents sont salariés, les 2 sont dans le canton de domicile de l'enfant, le parent salarié avec le plus gros salaire a droit
+    @Test
+    void getParentDroitAllocation_WhenBothParentsHaveActivityAndBothHaveAuthorityAndParentsLiveTogetherAndBothAreSalaried_ShouldReturnParent1() {
+        ParentAllocationParameters parameters = new ParentAllocationParameters(true, true, new BigDecimal("5000"), new BigDecimal("3000"), false, false, true, true, true, true, true, false, false);
         String result = allocationService.getParentDroitAllocation(parameters);
         assertThat(result).isEqualTo("Parent1");
     }
+
+    // Test inverse
+    @Test
+    void getParentDroitAllocation_WhenBothParentsHaveActivityAndBothHaveAuthorityAndParentsLiveTogetherAndBothAreSalaried_ShouldReturnParent2() {
+        ParentAllocationParameters parameters = new ParentAllocationParameters(true, true, new BigDecimal("3000"), new BigDecimal("5000"), false, false, true, true, true, true, true, false, false);
+        String result = allocationService.getParentDroitAllocation(parameters);
+        assertThat(result).isEqualTo("Parent2");
+    }
+
 }

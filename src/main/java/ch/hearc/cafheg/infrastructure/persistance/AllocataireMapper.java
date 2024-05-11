@@ -14,6 +14,9 @@ public class AllocataireMapper extends Mapper {
   private static final String QUERY_FIND_ALL = "SELECT NOM,PRENOM,NO_AVS FROM ALLOCATAIRES";
   private static final String QUERY_FIND_WHERE_NOM_LIKE = "SELECT NOM,PRENOM,NO_AVS FROM ALLOCATAIRES WHERE NOM LIKE ?";
   private static final String QUERY_FIND_WHERE_NUMERO = "SELECT NO_AVS, NOM, PRENOM FROM ALLOCATAIRES WHERE NUMERO=?";
+  private static final String QUERY_DELETE_BY_ID = "DELETE FROM ALLOCATAIRES WHERE NUMERO=?";
+  private static final String QUERY_UPDATE_NOM_PRENOM = "UPDATE ALLOCATAIRES SET NOM = ?, PRENOM = ? WHERE NUMERO = ?";
+  private static final String QUERY_FIND_NUMBER_VERSEMENTS = "SELECT COUNT(*) FROM VERSEMENTS WHERE FK_ALLOCATAIRES = ?";
 
   public List<Allocataire> findAll(String likeNom) {
     System.out.println("findAll() " + likeNom);
@@ -67,6 +70,57 @@ public class AllocataireMapper extends Mapper {
           resultSet.getString(2), resultSet.getString(3));
     } catch (SQLException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  public boolean hasVersements(long id) {
+    System.out.println("hasVersements() " + id);
+    Connection connection = activeJDBCConnection();
+    String query = QUERY_FIND_NUMBER_VERSEMENTS;
+    try {
+      PreparedStatement preparedStatement = connection.prepareStatement(QUERY_FIND_NUMBER_VERSEMENTS);
+      preparedStatement.setLong(1, id);
+      try (ResultSet resultSet = preparedStatement.executeQuery()) {
+        if (resultSet.next()) {
+          int count = resultSet.getInt(1);
+          return count > 0;
+        }
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException("Erreur lors de la vérification des versements de l'allocataire", e);
+    }
+    return false;
+  }
+
+  public boolean deleteById(long id) {
+    System.out.println("deleteById() " + id);
+    Connection connection = activeJDBCConnection();
+    try {
+      System.out.println("SQL:" + QUERY_DELETE_BY_ID);
+      PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DELETE_BY_ID);
+      preparedStatement.setLong(1, id);
+      int rowsAffected = preparedStatement.executeUpdate();
+      if (rowsAffected == 0) {
+        throw new RuntimeException("Aucun allocataire avec l'ID : " + id + " n'a été trouvé pour la suppression.");
+      }
+      System.out.println("Allocataire supprimé avec succès");
+      return true;
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void updateNomPrenom(long id, String nouveauNom, String nouveauPrenom) {
+    System.out.println("updateNomPrenom() " + id);
+    Connection connection = activeJDBCConnection();
+    try {
+      PreparedStatement preparedStatement = connection.prepareStatement(QUERY_UPDATE_NOM_PRENOM);
+      preparedStatement.setString(1, nouveauNom);
+      preparedStatement.setString(2, nouveauPrenom);
+      preparedStatement.setLong(3, id);
+      preparedStatement.executeUpdate();
+    } catch (SQLException e) {
+      throw new RuntimeException("Erreur lors de la mise à jour du nom et du prénom de l'allocataire", e);
     }
   }
 }

@@ -1,9 +1,6 @@
 package ch.hearc.cafheg.infrastructure.api;
 
-import ch.hearc.cafheg.business.allocations.Allocataire;
-import ch.hearc.cafheg.business.allocations.Allocation;
-import ch.hearc.cafheg.business.allocations.AllocationService;
-import ch.hearc.cafheg.business.allocations.ParentAllocationParameters;
+import ch.hearc.cafheg.business.allocations.*;
 import ch.hearc.cafheg.business.versements.VersementService;
 import ch.hearc.cafheg.infrastructure.pdf.PDFExporter;
 import ch.hearc.cafheg.infrastructure.persistance.AllocataireMapper;
@@ -23,11 +20,13 @@ public class RESTController {
 
   private final AllocationService allocationService;
   private final VersementService versementService;
+  private final AllocataireService allocataireService;
 
   public RESTController() {
     this.allocationService = new AllocationService(new AllocataireMapper(), new AllocationMapper());
     this.versementService = new VersementService(new VersementMapper(), new AllocataireMapper(),
         new PDFExporter(new EnfantMapper()));
+    this.allocataireService = new AllocataireService(new AllocataireMapper());
   }
 
   /*
@@ -78,5 +77,21 @@ public class RESTController {
   @GetMapping(value = "/allocataires/{allocataireId}/versements", produces = MediaType.APPLICATION_PDF_VALUE)
   public byte[] pdfVersements(@PathVariable("allocataireId") int allocataireId) {
     return inTransaction(() -> versementService.exportPDFVersements(allocataireId));
+  }
+
+  @DeleteMapping("/allocataires/{allocataireId}")
+  public String deleteAllocataire(@PathVariable("allocataireId") long allocataireId) {
+    if (inTransaction(() -> allocataireService.deleteAllocataire(allocataireId))){
+      return "Allocataire supprimé avec succès !";
+    }
+    return "Erreur lors de la suppression de l'allocataire";
+  }
+
+  @PutMapping("/allocataires/{allocataireId}")
+  public Allocataire updateAllocataire(
+          @PathVariable("allocataireId") long allocataireId,
+          @RequestParam("nom") String nouveauNom,
+          @RequestParam("prenom") String nouveauPrenom) {
+    return inTransaction(() -> allocataireService.updateNomPrenom(allocataireId, nouveauNom, nouveauPrenom));
   }
 }

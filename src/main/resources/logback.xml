@@ -1,0 +1,29 @@
+<configuration>
+    <timestamp key="byDay" datePattern="yyyyMMdd"/>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="CH_ERROR_FILE_APPENDER" class="ch.qos.logback.core.FileAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <file>err.log</file>
+    </appender>
+    <appender name="CH_INFO_BY_DAY_FILE_APPENDER" class="ch.qos.logback.core.FileAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <file>cafheg_${byDay}.log</file>
+    </appender>
+    <logger name="ch" level="error">
+        <appender-ref ref="CH_ERROR_FILE_APPENDER"/>
+    </logger>
+    <logger name="ch.hearc.cafheg" level="info">
+        <appender-ref ref="CH_INFO_BY_DAY_FILE_APPENDER"/>
+    </logger>
+    <root level="debug">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

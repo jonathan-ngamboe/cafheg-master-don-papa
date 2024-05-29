@@ -5,9 +5,11 @@ import ch.hearc.cafheg.infrastructure.persistance.AllocationMapper;
 
 import java.math.BigDecimal;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AllocationService {
-
+  private static final Logger logger = LoggerFactory.getLogger(AllocationService.class);
   private static final String PARENT_1 = "Parent1";
   private static final String PARENT_2 = "Parent2";
   private static final String AUCUN_DROIT = "Aucun droit";
@@ -22,7 +24,7 @@ public class AllocationService {
   }
 
   public List<Allocataire> findAllAllocataires(String likeNom) {
-    System.out.println("Rechercher tous les allocataires");
+    logger.info("Rechercher tous les allocataires");
     return allocataireMapper.findAll(likeNom);
   }
 
@@ -32,7 +34,7 @@ public class AllocationService {
 
   // Determine quel parent a le droit aux allocations
   public String getParentDroitAllocation(ParentAllocationParameters params) {
-    System.out.println("Déterminer quel parent a le droit aux allocations");
+    logger.info("Déterminer quel parent a le droit aux allocations");
 
     // Si aucun parent n'a d'activité lucrative, aucun droit
     if (!params.isParent1ActiviteLucrative() && !params.isParent2ActiviteLucrative()) {

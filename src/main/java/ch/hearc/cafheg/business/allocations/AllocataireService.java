@@ -15,6 +15,7 @@ public class AllocataireService {
         }
 
         if (allocataireMapper.hasVersements(id)) {
+
             throw new RuntimeException("L'allocataire a des versements et ne peut pas être supprimé.");
         }
 

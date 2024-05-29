@@ -38,16 +38,16 @@ public class Database {
    * @return Le résultat de l'éxécution de la fonction
    */
   public static <T> T inTransaction(Supplier<T> inTransaction) {
-    logger.info("inTransaction#start");
+    logger.debug("inTransaction#start");
     try {
-      logger.info("inTransaction#getConnection");
+      logger.debug("inTransaction#getConnection");
       connection.set(dataSource.getConnection());
       return inTransaction.get();
     } catch (Exception e) {
       throw new RuntimeException(e);
     } finally {
       try {
-        logger.info("inTransaction#closeConnection");
+        logger.debug("inTransaction#closeConnection");
         connection.get().close();
       } catch (SQLException e) {
         logger.error("SQL Error", e);

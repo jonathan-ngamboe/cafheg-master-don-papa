@@ -62,7 +62,7 @@ public class MyTestsIT {
 
     @ParameterizedTest
     @ValueSource(longs = {100})
-    public void deleteAllocataireWitVersements_GivenAllocataire_ShouldDelete(long allocataireId) {
+    public void deleteAllocataireWithVersements_GivenAllocataire_ShouldException(long allocataireId) {
         inTransaction(() -> {
             assertNotNull(allocataireService.findById(allocataireId));
             assertThrows(RuntimeException.class, () -> allocataireService.deleteAllocataire(allocataireId));

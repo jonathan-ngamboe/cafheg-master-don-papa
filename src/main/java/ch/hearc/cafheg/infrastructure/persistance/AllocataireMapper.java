@@ -66,10 +66,14 @@ public class AllocataireMapper extends Mapper {
       preparedStatement.setLong(1, id);
       ResultSet resultSet = preparedStatement.executeQuery();
       logger.trace("ResultSet#next");
-      resultSet.next();
-      logger.info("Allocataire mapping");
-      return new Allocataire(new NoAVS(resultSet.getString(1)),
-              resultSet.getString(2), resultSet.getString(3));
+      if(resultSet.next()) {
+        logger.info("Allocataire mapping");
+        return new Allocataire(new NoAVS(resultSet.getString(1)),
+                resultSet.getString(2), resultSet.getString(3));
+      } else {
+        logger.info("Allocataire introuvable");
+        return null;
+      }
     } catch (SQLException e) {
       logger.error("SQL Error", e);
       throw new RuntimeException(e);

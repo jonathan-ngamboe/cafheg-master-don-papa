@@ -23,7 +23,7 @@ public class Database {
    * active.
    * @return Connection JDBC active
    */
-  static Connection activeJDBCConnection() {
+  public static Connection activeJDBCConnection() {
     if(connection.get() == null) {
       logger.error ("Pas de connection JDBC active");
       //throw new RuntimeException("Pas de connection JDBC active");

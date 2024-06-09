@@ -130,7 +130,6 @@ public class AllocataireMapper extends Mapper {
       preparedStatement.executeUpdate();
     } catch (SQLException e) {
       logger.error("SQL Error", e);
-      //throw new RuntimeException("Erreur lors de la mise à jour du nom et du prénom de l'allocataire", e);
     }
   }
 }
